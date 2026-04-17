@@ -279,6 +279,37 @@
         right: 10px;
       }
 
+      /* Footer */
+      footer {
+        text-align: center;
+        padding: 80px 20px 60px;
+        border-top: 1px solid #1a1a1a;
+        margin-top: 50px;
+      }
+      footer h3 {
+        font-size: 1.5rem;
+        font-weight: 300;
+        margin-bottom: 20px;
+        color: #fff;
+      }
+      .contact-links {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+      }
+      .contact-links a {
+        color: #888;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        border: none;
+        transition: color 0.3s;
+      }
+      .contact-links a:hover {
+        color: #fff;
+      }
+
       /* Modal Text Layout */
       .modal-text {
         flex: 1.2;
@@ -349,7 +380,7 @@
   <body>
     <section class="hero">
       <h1 class="hero-title">Phone Min Khant</h1>
-      <p class="hero-subtitle">Selected Initiatives & Research</p>
+      <p class="hero-subtitle">Driven by impact, not by titles. These are my milestones so far.</p>
       <div class="scroll-down"></div>
     </section>
 
@@ -642,6 +673,14 @@
         </div>
       </div>
     </div>
+
+    <footer>
+      <h3>Let's build something together.</h3>
+      <div class="contact-links">
+        <a href="mailto:phoneminkhant1030501@gmail.com">Email Me</a>
+        <a href="https://www.linkedin.com/in/phone-min-khant/" target="_blank">LinkedIn</a>
+      </div>
+    </footer>
 
     <script>
       gsap.registerPlugin(ScrollTrigger);
