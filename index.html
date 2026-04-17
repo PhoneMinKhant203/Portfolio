@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phone Min Khant | Premium Portfolio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #050505;
+        color: #f0f0f0;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Hero Section */
+      .hero {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+      }
+
+      .hero h1 {
+        font-size: 4rem;
+        font-weight: 200;
+        letter-spacing: -0.05em;
+        margin-bottom: 20px;
+        opacity: 0; /* Hidden for entrance animation */
+        transform: translateY(30px);
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        color: #666;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0; /* Hidden for entrance animation */
+        transform: translateY(20px);
+      }
+
+      /* Scroll Indicator */
+      .scroll-down {
+        position: absolute;
+        bottom: 50px;
+        width: 1px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+      }
+
+      .scroll-down::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 50%;
+        background: #fff;
+        animation: scrollLine 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
+      }
+
+      @keyframes scrollLine {
+        0% {
+          transform: translateY(-100%);
+        }
+        100% {
+          transform: translateY(200%);
+        }
+      }
+
+      /* Timeline Base */
+      .timeline-wrapper {
+        position: relative;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 100px 20px;
+      }
+      .progress-line-container {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 2px;
+        background: #1a1a1a;
+        transform: translateX(-50%);
+      }
+      .progress-line {
+        width: 100%;
+        height: 0%;
+        background: #ffffff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      }
+
+      .timeline-item {
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 120px;
+      }
+      .timeline-item:nth-child(even) {
+        flex-direction: row-reverse;
+      }
+
+      /* Clickable Card */
+      .timeline-content {
+        width: 42%;
+        background: #0a0a0a;
+        padding: 20px;
+        border: 1px solid #1a1a1a;
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+          transform 0.3s,
+          border-color 0.3s;
+        opacity: 0;
+      }
+
+      .timeline-content:hover {
+        transform: translateY(-5px);
+        border-color: #555;
+      }
+
+      .card-thumb {
+        width: 100%;
+        height: 150px;
+        background: #222;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        object-fit: cover;
+        filter: grayscale(100%);
+        transition: filter 0.3s;
+      }
+      .timeline-content:hover .card-thumb {
+        filter: grayscale(0%);
+      }
+
+      .timeline-date {
+        font-size: 0.8rem;
+        color: #888;
+        margin-bottom: 10px;
+        display: block;
+      }
+      .timeline-title {
+        font-size: 1.3rem;
+        font-weight: 400;
+        color: #fff;
+      }
+      .timeline-node {
+        width: 12px;
+        height: 12px;
+        background: #050505;
+        border: 2px solid #333;
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+      }
+
+      /* Modal / Expanded View */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        visibility: hidden;
+        opacity: 0;
+        backdrop-filter: blur(5px);
+      }
+
+      .modal-card {
+        background: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 900px;
+        max-height: 90vh; /* Prevents blowing off screen */
+        padding: 40px;
+        position: relative;
+        transform: scale(0.8);
+        opacity: 0;
+        display: flex;
+        gap: 30px;
+        overflow-y: auto; /* Adds scroll if content is too long */
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2rem;
+        cursor: pointer;
+        transition: color 0.3s;
+        z-index: 10;
+      }
+      .modal-close:hover {
+        color: #888;
+      }
+
+      /* Gallery CSS */
+      .modal-gallery {
+        flex: 1;
+        position: relative;
+        background: #111;
+        border-radius: 8px;
+        overflow: hidden;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .gallery-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: 1px solid #333;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1rem;
+        display: none; /* Hidden by default */
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.3s,
+          border-color 0.3s;
+        z-index: 5;
+      }
+
+      .gallery-btn:hover {
+        background: rgba(0, 0, 0, 0.9);
+        border-color: #888;
+      }
+      .gallery-prev {
+        left: 10px;
+      }
+      .gallery-next {
+        right: 10px;
+      }
+
+      /* Modal Text Layout */
+      .modal-text {
+        flex: 1.2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .modal-text h2 {
+        font-size: 2rem;
+        margin-bottom: 5px;
+        font-weight: 300;
+      }
+      .modal-text .modal-date {
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 25px;
+        display: block;
+      }
+
+      .modal-section {
+        margin-bottom: 20px;
+      }
+      .modal-section h3 {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #fff;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 5px;
+      }
+      .modal-section p {
+        font-size: 0.95rem;
+        color: #aaa;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 768px) {
+        .progress-line-container,
+        .timeline-node {
+          left: 30px;
+        }
+        .timeline-item,
+        .timeline-item:nth-child(even) {
+          flex-direction: column;
+          align-items: flex-end;
+        }
+        .timeline-content {
+          width: calc(100% - 60px);
+        }
+        .modal-card {
+          flex-direction: column;
+          padding: 30px 20px;
+        }
+        .modal-gallery {
+          width: 100%;
+          flex: none;
+          height: 250px;
+          min-height: 250px;
+        }
+        .modal-close {
+          top: 5px;
+          right: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <h1 class="hero-title">Phone Min Khant</h1>
+      <p class="hero-subtitle">Selected Initiatives & Research</p>
+      <div class="scroll-down"></div>
+    </section>
+
+    <div class="timeline-wrapper">
+      <div class="progress-line-container">
+        <div class="progress-line"></div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-node"></div>
+        <div
+          class="timeline-content"
+          data-title="Myanmar Agri-Med AI"
+          data-date="Mar 30, 2026"
+          data-what="Designed and developed Myanmar Agri-Med AI, a domain-specific, instruction-tuned conversational AI built to bridge the digital information divide for rural communities in the agriculture and healthcare sectors."
+          data-how='I fine-tuned a lightweight multilingual model using custom localized datasets. To guarantee factual safety and prevent AI hallucinations, I engineered a Retrieval-Augmented Generation (RAG) pipeline utilizing FAISS vector search. I then deployed the solution via a Streamlit web interface featuring domain switching, safety distance thresholds, and automatic medical disclaimers.'
+          data-success="The system achieved 90% semantic match accuracy, ultra-fast 0.85-second response times, and a 4.67/5 user rating for safety and linguistic clarity. The project validated my undergraduate thesis (securing First Class Honours) and is published openly on <a href='https://zenodo.org/records/19339756' target='_blank' style='color:#fff; text-decoration:underline;'>Zenodo</a> to advance low-resource NLP research."
+          data-images="images/Agri_Med/PhoneView.png, images/Agri_Med/PhoneView_2.png, images/Agri_Med/Conversation.png, images/Agri_Med/Mapping.png"
+        >
+          <img
+            src="images/Agri_Med/overview.png"
+            alt="Thumbnail"
+            class="card-thumb"
+          />
+          <span class="timeline-date">Mar 30, 2026</span>
+          <h2 class="timeline-title">Myanmar Agri-Med AI</h2>
+        </div>
+        <div style="width: 42%"></div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-node"></div>
+        <div
+          class="timeline-content"
+          data-title="Sarthin Platform Launch"
+          data-date="Dec 18, 2025"
+          data-what="Founded and spearheaded the development of <a href='https://sarthin.com/' target='_blank' style='color:#fff; text-decoration:underline;'>Sarthin - စာသင်</a>, a social enterprise EdTech platform. I served as the primary bridge between technical execution and social mission, ensuring the platform was both functional and accessible."
+          data-how="Managed a cross-functional team to build a custom Moodle-based LMS. I led the technical integration of localized bank payment gateways and orchestrated partnerships with international NGOs to streamline educational delivery."
+          data-success="Launched our Web Development course and managed a scholarship initiative for 38 students in collaboration with <a href='https://cpintl.org/' target='_blank' style='color:#fff; text-decoration:underline;'>Community Partners International (CPI)</a> and <a href='https://www.cpt-foundation.org/' target='_blank' style='color:#fff; text-decoration:underline;'>New Future YouthCorner</a>."
+          data-images="images/Sarthin/Payment.png, images/Sarthin/overview.png, images/Sarthin/knowledgesharing.png, images/Sarthin/lecture.png, images/Sarthin/me.png, images/Sarthin/reading.png, images/Sarthin/Web.png, images/Sarthin/scholarship.png"
+        >
+          <img src="images/Sarthin.png" alt="Thumbnail" class="card-thumb" />
+          <span class="timeline-date">Dec 18, 2025</span>
+          <h2 class="timeline-title">Sarthin Platform Launch</h2>
+        </div>
+        <div style="width: 42%"></div>
+      </div>
+
+      <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Social Enterprise Evolution & Grant" 
+                 data-date="Aug 2025"
+                 data-what="Transformed Sarthin from a solo, unfunded university project into a fully-fledged social enterprise powered by a sustainable scholarship model."
+                 data-how="I leveraged our working prototype and local-payment architecture to pitch our vision to <a href='https://cpintl.org/' target='_blank' style='color:#fff; text-decoration:underline;'>Community Partners International (CPI)</a>. By demonstrating traction and a clear solution to the financial barrier, I secured the critical grant funding needed to scale our infrastructure."
+                 data-success="The grant allowed us to finalize production and establish a sustainable &quot;scholarship chain,&quot; ensuring that revenue from the platform could continuously fund free education for underserved learners across the country."
+                 data-images="images/Social/intro.jpg, images/Social/fund_raising.png">
+                
+                <img src="images/Social/evolve.png" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Aug 2025</span>
+                <h2 class="timeline-title">Social Enterprise Evolution</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="EdTech Innovation & Ideation" 
+                 data-date="Apr 2025"
+                 data-what="Started Sarthin as a passion project during my university studies—a simple vision to allow anyone in Myanmar to learn coding anywhere, anytime, in their own language."
+                 data-how="I initially built a basic self-learning platform to share my own coding knowledge. However, I quickly hit a massive roadblock: the local payment barrier. With no initial funding, I chose to face the uncertainty head-on, pivoting the technical architecture to integrate local banking systems from scratch."
+                 data-success="Successfully built a working technical prototype that proved our core thesis: &quot;What if anyone in Myanmar could learn to code — from anywhere, in their own language?&quot;"
+                 data-images="images/idea/first.jpg, images/idea/1.png, images/idea/2.png, images/idea/3.png">
+                
+                <img src="images/idea/why.png" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Apr 2025</span>
+                <h2 class="timeline-title">EdTech Innovation</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="IoT Robotics Research" 
+                 data-date="Mar 2025"
+                 data-what="Designed and engineered an autonomous, low-cost obstacle detection and avoidance robot tailored for real-time navigation within IoT and Big Data environments."
+                 data-how="I built the hardware architecture using an ESP32 microcontroller integrated with a precision three-point ultrasonic sensor array. I specifically leveraged the ESP32's wireless capabilities to make the system highly scalable, allowing it to collect real-time spatial data for remote decision-making."
+                 data-success="The research was peer-reviewed and accepted at the 10th International Conference on Big Data Analytics (ICBDA 2025) in Singapore. The full paper is published openly on <a href='https://zenodo.org/records/19335334' target='_blank' style='color:#fff; text-decoration:underline;'>Zenodo</a>."
+                 
+                 data-images="images/iot/1.png, images/iot/2.png, images/iot/3.png, images/iot/4.png, images/iot/5.png, images/iot/6.png">
+                
+                <img src="images/iot/final.png" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Mar 2025</span>
+                <h2 class="timeline-title">IoT Robotics Research</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Corporate Wellness & Trauma Healing" 
+                 data-date="Oct 2023 - Jan 2024"
+                 data-what="Facilitated a comprehensive series of Corporate Wellness, Life Coaching, and Trauma Healing events designed to foster psychological resilience for leading corporate teams and the general public."
+                 data-how="In collaboration with the Breakout organization, I designed and led interactive workshops utilizing therapeutic frameworks like the Medicine Wheel alongside collaborative empathy exercises. These sessions were specifically tailored to help professionals maintain their authenticity and mental clarity while navigating environments of high systemic uncertainty."
+                 data-success="Successfully delivered over 10 high-impact corporate sessions-reaching 40 to 60 professionals per session-to major Myanmar enterprises—including <a href='https://www.chochoindustry.com/' target='_blank' style='color:#fff; text-decoration:underline;'>Cho Cho Industry</a> and Golden Duck Restaurant (Yangon & Mandalay)—as well as hosting 2 dedicated trauma healing events for the broader community."
+                 
+                 data-images="images/corporate/board.jpg, images/corporate/team.jpg, images/corporate/team_2.jpg, images/corporate/board_2.jpg, images/corporate/trauma.jpg">
+                
+                <img src="images/corporate/me.png" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Oct 2023 - Jan 2024</span>
+                <h2 class="timeline-title">Corporate Wellness Series</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Global Program Management" 
+                 data-date="Jun 2024"
+                 data-what="Served as Project Coordinator and Youth Ambassador, managing the end-to-end operations of a comprehensive 1-year online Diploma in Social Work program.<a href='https://yssw.org/' target='_blank' style='color:#fff; text-decoration:underline;'>(YSSW)</a>"
+                 data-how="Acting strictly in a management capacity, I directed cross-functional operations across IT, marketing, and academic faculty. I handled the integration of international donation tools and coordinated a widespread recruitment drive that attracted applicants from Myanmar, Thailand, and Bangladesh. Additionally, I oversaw the complex logistics required to facilitate a rigorous 200-hour field placement internship."
+                 data-success="Successfully scaled the program internationally and ensured the seamless operational delivery of both digital coursework and physical internships, demonstrating my ability to manage high-stakes, multi-national educational logistics."
+                 
+                 data-images="images/yssw/demographic.png">
+                
+                <img src="images/yssw/program.jpg" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Jun 2024</span>
+                <h2 class="timeline-title">Global Program Management</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Open Mic 2024: Advocacy & Inclusion" 
+                 data-date="May 2024"
+                 data-what="As Program Coordinator, I orchestrated &quot;Open Mic 2024&quot; with the Friedrich Naumann Foundation for Freedom (FNF), creating a safe, high-profile platform for marginalized communities to speak out on gender-based discrimination."
+                 data-how="I directed end-to-end event logistics—from nationwide speaker recruitment to stage production. Crucially, I spearheaded cross-sector coordination to provide real-time psychosocial support and expert panelists for speakers discussing systemic trauma."
+                 data-success="Successfully delivered an emotionally safe, large-scale advocacy event for over 80 attendees, featuring 12 speakers sharing distinct, personal stories. I seamlessly balanced heavy operational logistics with critical mental health care, ensuring those unheard voices were amplified powerfully and safely."
+                 
+                 data-images="images/openmic/overview.jpg">
+                
+                <img src="images/openmic/me.jpg" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">May 2024</span>
+                <h2 class="timeline-title">Open Mic 2024 (FNF)</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Life Skills for Street Children" 
+                 data-date="Jan - Feb 2024"
+                 data-what="Served as Project Coordinator for an 8-part Life Skills Training series dedicated to empowering street children amidst severe socio-economic challenges and instability in Myanmar."
+                 data-how="Overcoming extreme logistical and security hurdles, I successfully negotiated and collaborated with local authorities and community leaders to secure safe gathering spaces, emergency shelter, and daily meals for all participants."
+                 data-success="The initiative provided immediate systemic relief and tangibly altered the trajectory of these youths' lives, successfully transitioning several children directly off the streets and into the active workforce (securing roles in delivery and hospitality)."
+                 
+                 data-images="images/life/food.png">
+                
+                <img src="images/life/me.png" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Jan - Feb 2024</span>
+                <h2 class="timeline-title">Life Skills for Street Children</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Generative AI Capacity Building" 
+                 data-date="Dec 2023 - Mar 2024"
+                 data-what="Directed a massive Generative AI Literacy Campaign across major institutions, training UNDP Myanmar, 22 CSOs, <a href='https://www.kbzbank.com/en/' target='_blank' style='color:#fff; text-decoration:underline;'>KBZ Bank</a>, and hosting a record-breaking event at the American Center for over 180 attendees."
+                 data-how="As Project Coordinator and Co-Trainer across 25+ workshops, I designed curriculums focused on Prompt Engineering, workflow optimization, and AI-driven multimedia generation tailored specifically for non-profit fundraising and efficiency."
+                 data-success="Achieved a program-high <strong>4.7/5 satisfaction rating</strong>. The training yielded immediate real-world ROI, empowering multiple organizations to successfully deploy AI-generated content for their independent fundraising campaigns."
+                 
+                 data-images="images/ai/bank.jpg, images/ai/co.jpg, images/ai/cso.jpg, images/ai/cso_2.jpg, images/ai/un.jpg">
+                
+                <img src="images/ai/ac.jpg" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Dec 2023 - Mar 2024</span>
+                <h2 class="timeline-title">Generative AI Capacity Building</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="ASEAN Economic Roundtable" 
+                 data-date="Aug 10, 2023"
+                 data-what="Represented Myanmar at a high-level roundtable on Advancing Regional Integration, hosted by the Institute for Democracy and Economic Affairs (IDEAS)."
+                 data-how="Engaged in complex geopolitical and economic discourse, advocating specifically for the priorities and inclusion of Myanmar's youth within the ASEAN Economic Community 2025 framework."
+                 data-success="Amplified local youth perspectives on an international policy stage, demonstrating strong regional diplomacy and cross-border economic awareness."
+                 data-images="images/round/discussion.jpg, images/round/standing.jpg">
+                
+                <img src="images/round/me.jpg" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Aug 10, 2023</span>
+                <h2 class="timeline-title">ASEAN Economic Roundtable</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Youth Entrepreneurship Award" 
+                 data-date="Jul 29, 2023"
+                 data-what="Won First Place for business idea pitching at the 6-day AYFN Youth Entrepreneurship and Leadership Camp in Bali, Indonesia."
+                 data-how="Developed and pitched a comprehensive, viable business model to international judges, competing against top youth leaders and entrepreneurs from across the region."
+                 data-success="Secured the top award, validating my entrepreneurial frameworks, strategic planning, and cross-cultural public speaking skills on a highly competitive international platform."
+                 data-images="images/bali/presenting.jpg, images/bali/team.jpg, images/bali/happy.jpg">
+                
+                <img src="images/bali/overall.jpg" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Jul 29, 2023</span>
+                <h2 class="timeline-title">Award: Youth Entrepreneurship</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="NextGen Impact Initiatives" 
+                 data-date="Mar - Aug 2023"
+                 data-what="Co-founded 'NextGen Impact', a youth-led non-profit organization dedicated to community empowerment, mental wellness, and education."
+                 data-how="Managed a team of youth volunteers to design and execute multiple concurrent social initiatives, including active fundraising campaigns, donation drives, and knowledge-sharing workshops."
+                 data-success="Successfully mobilized grassroots community action, delivering crucial psychosocial and educational support during a highly volatile period for local youth."
+                 data-images="images/ngi/founders.jpg, images/ngi/1.jpg, images/ngi/2.jpg, images/ngi/3.jpg, images/ngi/4.jpg">
+                
+                <img src="images/ngi/overview.jpg" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Mar - Aug 2023</span>
+                <h2 class="timeline-title">NextGen Impact Initiatives</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+<div class="timeline-item">
+            <div class="timeline-node"></div>
+            <div class="timeline-content" 
+                 data-title="Youth Conversation Club (MMU)" 
+                 data-date="Apr 2020 - Mar 2021"
+                 data-what="Served as Lead Organizer for the Youth Conversation Club at Myanmar Maritime University (MMU), spearheading its digital transformation during the global pandemic."
+                 data-how="When COVID-19 restrictions abruptly halted all physical university activities, I took the initiative to rally the members and keep the community's spirits high. I orchestrated a complete pivot to virtual platforms, organizing and hosting continuous digital debate series to maintain student engagement remotely."
+                 data-success="Successfully revived the club's momentum during a period of extreme isolation, preserving a vital space for intellectual discourse and laying my early foundation in crisis management and digital community building."
+                 data-images="images/ycc/detail.jpg">
+                
+                <img src="images/ycc/front.jpg" alt="Thumbnail" class="card-thumb">
+                <span class="timeline-date">Apr 2020 - Mar 2021</span>
+                <h2 class="timeline-title">Youth Conversation Club (MMU)</h2>
+            </div>
+            <div style="width: 42%;"></div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-card" id="modalCard">
+        <button class="modal-close" id="closeBtn">&times;</button>
+
+        <div class="modal-gallery">
+          <button class="gallery-btn gallery-prev" id="prevBtn">
+            &#10094;
+          </button>
+          <img src="" alt="Project Image" class="modal-img" id="modalImg" />
+          <button class="gallery-btn gallery-next" id="nextBtn">
+            &#10095;
+          </button>
+        </div>
+
+        <div class="modal-text">
+          <h2 id="modalTitle">Project Title</h2>
+          <span class="modal-date" id="modalDate">Date</span>
+          <div class="modal-section">
+            <h3>What I Did</h3>
+            <p id="modalWhat">Details...</p>
+          </div>
+          <div class="modal-section">
+            <h3>How I Did It</h3>
+            <p id="modalHow">Details...</p>
+          </div>
+          <div class="modal-section">
+            <h3>Success & Impact</h3>
+            <p id="modalSuccess">Details...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Hero Entrance Animation
+      const tl = gsap.timeline();
+      tl.to(".hero-title", {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+      }).to(
+        ".hero-subtitle",
+        { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
+        "-=0.6",
+      );
+
+      // Timeline Scroll Animation
+      gsap.to(".progress-line", {
+        height: "100%",
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".timeline-wrapper",
+          start: "top center",
+          end: "bottom center",
+          scrub: 0.5,
+        },
+      });
+
+      const items = document.querySelectorAll(".timeline-item");
+      items.forEach((item, index) => {
+        const content = item.querySelector(".timeline-content");
+        const node = item.querySelector(".timeline-node");
+        const isEven = index % 2 !== 0;
+
+        gsap.fromTo(
+          content,
+          { opacity: 0, x: isEven ? -50 : 50 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: item,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          },
+        );
+
+        gsap.to(node, {
+          background: "#ffffff",
+          borderColor: "#ffffff",
+          scale: 1.3,
+          scrollTrigger: {
+            trigger: item,
+            start: "top 50%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      });
+
+      // Modal & Gallery Logic
+      const overlay = document.getElementById("modalOverlay");
+      const card = document.getElementById("modalCard");
+      const closeBtn = document.getElementById("closeBtn");
+      const cards = document.querySelectorAll(".timeline-content");
+
+      let currentImageArray = [];
+      let currentImgIndex = 0;
+
+      cards.forEach((cardElem) => {
+        cardElem.addEventListener("click", () => {
+          // Parse the data-images attribute into an array
+          const imagesAttr = cardElem.getAttribute("data-images");
+          currentImageArray = imagesAttr
+            ? imagesAttr.split(",").map((s) => s.trim())
+            : [];
+          currentImgIndex = 0;
+
+          // Set the first image
+          if (currentImageArray.length > 0) {
+            document.getElementById("modalImg").src = currentImageArray[0];
+          }
+
+          // Show or hide arrows based on how many images exist
+          const prevBtn = document.getElementById("prevBtn");
+          const nextBtn = document.getElementById("nextBtn");
+
+          if (currentImageArray.length > 1) {
+            prevBtn.style.display = "flex";
+            nextBtn.style.display = "flex";
+          } else {
+            prevBtn.style.display = "none";
+            nextBtn.style.display = "none";
+          }
+
+          // Populate text
+          document.getElementById("modalTitle").innerText =
+            cardElem.getAttribute("data-title");
+          document.getElementById("modalDate").innerText =
+            cardElem.getAttribute("data-date");
+
+          // Changed these three to .innerHTML so your links work!
+          document.getElementById("modalWhat").innerHTML =
+            cardElem.getAttribute("data-what");
+          document.getElementById("modalHow").innerHTML =
+            cardElem.getAttribute("data-how");
+          document.getElementById("modalSuccess").innerHTML =
+            cardElem.getAttribute("data-success");
+
+          // Animate in
+          gsap.to(overlay, { autoAlpha: 1, duration: 0.3 });
+          gsap.to(card, {
+            autoAlpha: 1,
+            scale: 1,
+            duration: 0.5,
+            ease: "back.out(1.2)",
+            delay: 0.1,
+          });
+          document.body.style.overflow = "hidden";
+        });
+      });
+
+      // Next / Prev Button Logic
+      document.getElementById("nextBtn").addEventListener("click", () => {
+        currentImgIndex = (currentImgIndex + 1) % currentImageArray.length;
+        document.getElementById("modalImg").src =
+          currentImageArray[currentImgIndex];
+      });
+
+      document.getElementById("prevBtn").addEventListener("click", () => {
+        currentImgIndex =
+          (currentImgIndex - 1 + currentImageArray.length) %
+          currentImageArray.length;
+        document.getElementById("modalImg").src =
+          currentImageArray[currentImgIndex];
+      });
+
+      // Close Logic
+      function closeModal() {
+        gsap.to(card, {
+          autoAlpha: 0,
+          scale: 0.8,
+          duration: 0.3,
+          ease: "power2.in",
+        });
+        gsap.to(overlay, { autoAlpha: 0, duration: 0.3, delay: 0.1 });
+        document.body.style.overflow = "auto";
+      }
+
+      closeBtn.addEventListener("click", closeModal);
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeModal();
+      });
+    </script>
+  </body>
+</html>
